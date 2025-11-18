@@ -1,0 +1,2 @@
+set CLOCK_SMALL 12.0
+set CLOCK_FAST 12.0
