@@ -47,6 +47,8 @@ for arc in $ARCHS; do
         value=$1
         unit=$2
         case "$unit" in
+            fs) awk "BEGIN {print $value / 1000000}" ;;
+            ps) awk "BEGIN {print $value / 1000}" ;;
             ns) echo "$value" ;;
             us) awk "BEGIN {print $value * 1000}" ;;
             ms) awk "BEGIN {print $value * 1000000}" ;;
@@ -66,7 +68,7 @@ for arc in $ARCHS; do
     # echo "Simulation runtime: ${runtime_ns} ns (${runtime_us} us)"
 
     runtime_us=$(awk "BEGIN {print $runtime_ns / 1000}")
-    echo "Simulation runtime: ${runtime_ns} us"
+    echo "Simulation runtime: ${runtime_ns} ns"
 
     LATENCY=$runtime_ns
 
