@@ -16,11 +16,17 @@
 // dma configuration
 #define DMA_SIZE SIZE_DWORD
 #define DATA_WIDTH 32
-
+#if defined(ARC_SMALL)
+#define FPDATA_WL 28
+#define FPDATA_IL 14
+#define FPDATA_WWL 28
+#define FPDATA_WIL 14
+#else
 #define FPDATA_WL 32
 #define FPDATA_IL 16
 #define FPDATA_WWL 32
 #define FPDATA_WIL 16
+#endif
 
 // accelerator configuration
 #define VEC_LEN 8
