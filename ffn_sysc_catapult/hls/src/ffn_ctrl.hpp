@@ -1,6 +1,9 @@
 // Copyright (c) 2011-2024 Columbia University, System Level Design Group
 // SPDX-License-Identifier: Apache-2.0
 
+// FURTHER NOTES: PIPELINE - PRAGMA!
+// FURTHER NOTES: UNROLL MORE LOOPS!
+
 #ifndef __FFN_CTRL_HPP__
 #define __FFN_CTRL_HPP__
 
@@ -270,24 +273,31 @@ SC_MODULE(AccController)
                                 }
                             }
                             
-                            
+                            // Compute input PLM address once for this w_ii
+                            int in_addr = (indim*seq_ii + w_ii) / VEC_LEN;
+                            int in_bank = (w_ii % VEC_LEN);
+
+                            // Read and convert input ONCE
+                            data_convert_NVint(plm_in_ping[in_bank][in_addr], in_word[0]);
+                            #ifdef FL_POINT
+                                int2f(in_word[0], in[0]);
+                            #else
+                                int2fx(in_word[0], in[0]);
+                            #endif
+                            FPDATA in_scalar = in[0];   // broadcast this
+
+                            // VEC LOOP
+                            #pragma HLS UNROLL
                             for (int vec=0; vec<VEC_LEN; vec++)
                             {
-                                in_addr = (indim*seq_ii+w_ii)/VEC_LEN;
-                                in_bank = (w_ii % VEC_LEN);
-                                
-                                data_convert_NVint(plm_in_ping[in_bank][in_addr], in_word[vec]);
-                            #ifdef FL_POINT
-                                int2f(in_word[vec], in[vec]);
-                            #else
-                                int2fx(in_word[vec], in[vec]);
-                            #endif
-                                in_buffer.data[vec] = in[vec];
-                                
+                                // Broadcast same input scalar to every lane
+                                in_buffer.data[vec] = in_scalar;
+
+                                // Per-lane weight (bank = vec)
                                 w_addr = w_ii;
                                 w_bank = vec;
-                                
-                                data_convert_NVint(plm_weight_ping[w_bank][w_addr], weight_word[vec]);
+
+                               data_convert_NVint(plm_weight_ping[w_bank][w_addr], weight_word[vec]);
                             #ifdef FL_POINT
                                 int2f(weight_word[vec], weight[vec]);
                             #else
@@ -295,6 +305,7 @@ SC_MODULE(AccController)
                             #endif
                                 weight_buffer.data[vec] = weight[vec];
                             }
+
                             
                             vec_in_itcn.Push(in_buffer);
                             vec_weight_itcn.Push(weight_buffer);
