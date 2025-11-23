@@ -263,6 +263,7 @@ SC_MODULE(AccController)
 
                         for (int32_t w_ii=0; w_ii<indim; w_ii++)
                         {
+                            #pragma HLS PIPELINE
                             if (w_ii > 0) {
                                 for (int vec=0; vec<VEC_LEN; vec++){
                                     psum_buffer.data[vec] = res_buffer.data[vec];
