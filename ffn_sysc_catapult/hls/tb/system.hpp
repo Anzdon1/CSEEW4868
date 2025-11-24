@@ -38,7 +38,7 @@ SC_MODULE(system_t)
 #if defined(ARC_SMALL)
         ,clk("clk", 12.00, SC_NS, 0.5, 0, SC_NS, true)
 #elif defined(ARC_FAST)
-        ,clk("clk", 10.00, SC_NS, 0.5, 0, SC_NS, true)
+        ,clk("clk", 5.00, SC_NS, 0.5, 0, SC_NS, true)
 #endif 
         ,testbench_inst("testbench_inst") 
     {
